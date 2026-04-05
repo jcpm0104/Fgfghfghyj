@@ -1,0 +1,813 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Future Capital - Savings Calculator v1</title>
+  <style>
+    :root {
+      --bg: #081224;
+      --bg2: #0d1f3d;
+      --card: rgba(255,255,255,0.08);
+      --card-border: rgba(255,255,255,0.14);
+      --text: #eef4ff;
+      --muted: #b7c5e3;
+      --accent: #4ea1ff;
+      --accent2: #7cc4ff;
+      --good: #4ade80;
+      --warn: #f59e0b;
+      --bad: #fb7185;
+      --shadow: 0 18px 40px rgba(0,0,0,0.35);
+      --radius: 18px;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: Inter, Arial, Helvetica, sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at top left, rgba(78,161,255,0.2), transparent 28%),
+        radial-gradient(circle at top right, rgba(124,196,255,0.15), transparent 22%),
+        linear-gradient(180deg, var(--bg2), var(--bg));
+      min-height: 100vh;
+    }
+
+    .wrap {
+      width: min(1280px, calc(100% - 28px));
+      margin: 0 auto;
+      padding: 28px 0 56px;
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: 1.35fr 0.9fr;
+      gap: 18px;
+      align-items: stretch;
+      margin-bottom: 18px;
+    }
+
+    .hero-card, .card {
+      background: var(--card);
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(10px);
+    }
+
+    .hero-card {
+      padding: 28px;
+    }
+
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.1);
+      font-size: 13px;
+      color: var(--accent2);
+      margin-bottom: 16px;
+      letter-spacing: 0.3px;
+    }
+
+    h1 {
+      margin: 0 0 10px;
+      font-size: clamp(34px, 5vw, 56px);
+      line-height: 0.98;
+      letter-spacing: -1.6px;
+    }
+
+    .hero p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.6;
+      font-size: 15px;
+    }
+
+    .quick-stats {
+      padding: 22px;
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+    }
+
+    .mini {
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 14px;
+      padding: 16px;
+    }
+
+    .mini-label {
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.9px;
+    }
+
+    .mini-value {
+      font-size: 24px;
+      font-weight: 800;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1.15fr 0.85fr;
+      gap: 18px;
+    }
+
+    .card {
+      padding: 20px;
+    }
+
+    .section-title {
+      margin: 0 0 14px;
+      font-size: 22px;
+      letter-spacing: -0.5px;
+    }
+
+    .subtext {
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.55;
+      margin-bottom: 18px;
+    }
+
+    .fields, .two-col, .three-col {
+      display: grid;
+      gap: 12px;
+    }
+
+    .two-col { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .three-col { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+    }
+
+    label {
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    input, select {
+      width: 100%;
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 12px;
+      background: rgba(4, 13, 28, 0.68);
+      color: var(--text);
+      padding: 13px 14px;
+      outline: none;
+      font-size: 15px;
+    }
+
+    input:focus, select:focus {
+      border-color: rgba(78,161,255,0.65);
+      box-shadow: 0 0 0 3px rgba(78,161,255,0.16);
+    }
+
+    .row-card {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 16px;
+      padding: 14px;
+      margin-bottom: 12px;
+    }
+
+    .row-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+
+    .row-title {
+      font-size: 14px;
+      color: var(--accent2);
+      font-weight: 700;
+      letter-spacing: 0.3px;
+    }
+
+    .btn-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    button {
+      border: none;
+      border-radius: 12px;
+      padding: 12px 16px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: transform .16s ease, opacity .16s ease, box-shadow .16s ease;
+      font-size: 14px;
+    }
+
+    button:hover { transform: translateY(-1px); }
+    button:active { transform: translateY(0); }
+
+    .primary {
+      background: linear-gradient(135deg, var(--accent), #2e79ff);
+      color: white;
+      box-shadow: 0 10px 22px rgba(46,121,255,0.25);
+    }
+
+    .secondary {
+      background: rgba(255,255,255,0.09);
+      color: var(--text);
+      border: 1px solid rgba(255,255,255,0.12);
+    }
+
+    .danger {
+      background: rgba(251,113,133,0.13);
+      color: #ffd1d9;
+      border: 1px solid rgba(251,113,133,0.26);
+      padding: 9px 12px;
+      font-size: 13px;
+    }
+
+    .result-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .result-card {
+      background: rgba(255,255,255,0.055);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 16px;
+      padding: 16px;
+    }
+
+    .result-card h3 {
+      margin: 0 0 6px;
+      font-size: 13px;
+      color: var(--muted);
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.9px;
+    }
+
+    .result-value {
+      font-size: 28px;
+      font-weight: 900;
+      letter-spacing: -0.8px;
+      margin-bottom: 6px;
+    }
+
+    .tiny-note {
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.45;
+    }
+
+    .good { color: var(--good); }
+    .bad { color: var(--bad); }
+    .warn { color: var(--warn); }
+
+    .bar-wrap {
+      margin-top: 18px;
+      padding-top: 10px;
+      border-top: 1px solid rgba(255,255,255,0.08);
+    }
+
+    .bar-title {
+      margin-bottom: 8px;
+      font-size: 14px;
+      color: var(--muted);
+    }
+
+    .bar {
+      height: 16px;
+      border-radius: 999px;
+      overflow: hidden;
+      display: flex;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.08);
+    }
+
+    .bar-income, .bar-expenses, .bar-savings {
+      height: 100%;
+    }
+
+    .bar-income { background: #5db4ff; }
+    .bar-expenses { background: #f59e0b; }
+    .bar-savings { background: #4ade80; }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+      overflow: hidden;
+      border-radius: 16px;
+      border: 1px solid rgba(255,255,255,0.08);
+    }
+
+    th, td {
+      padding: 12px 10px;
+      text-align: left;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+    }
+
+    th {
+      font-size: 12px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      background: rgba(255,255,255,0.04);
+    }
+
+    tr:last-child td { border-bottom: none; }
+
+    .footer-note {
+      margin-top: 16px;
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.55;
+    }
+
+    @media (max-width: 980px) {
+      .hero, .grid { grid-template-columns: 1fr; }
+      .two-col, .three-col, .result-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <section class="hero">
+      <div class="hero-card">
+        <div class="brand">Future Capital • Savings Calculator v1</div>
+        <h1>Build your real savings picture.</h1>
+        <p>
+          This first version lets you enter multiple income sources, monthly expenses, annual increases for each expense,
+          and the real impact of taxes paid or refunded. It shows a gross result and a tax-adjusted result so you can
+          test whether the math matches real life.
+        </p>
+      </div>
+      <div class="hero-card quick-stats">
+        <div class="mini">
+          <div class="mini-label">What it calculates</div>
+          <div class="mini-value">Income vs Expenses</div>
+        </div>
+        <div class="mini">
+          <div class="mini-label">Tax mode</div>
+          <div class="mini-value">Paid or Refunded</div>
+        </div>
+        <div class="mini">
+          <div class="mini-label">Projection</div>
+          <div class="mini-value">Up to 5 Years</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="grid">
+      <div class="card">
+        <h2 class="section-title">Inputs</h2>
+        <div class="subtext">Fill out your personal case first. Later this can be expanded into the public/pro version.</div>
+
+        <div class="fields">
+          <div class="two-col">
+            <div class="field">
+              <label for="fullName">Your name</label>
+              <input id="fullName" type="text" placeholder="Example: Julio Perera" />
+            </div>
+            <div class="field">
+              <label for="profession">Profession / what you do</label>
+              <input id="profession" type="text" placeholder="Example: W-2 worker, Amazon Flex, trading" />
+            </div>
+          </div>
+
+          <div class="two-col">
+            <div class="field">
+              <label for="projectionYears">Projection years</label>
+              <select id="projectionYears">
+                <option value="1">1 year</option>
+                <option value="3">3 years</option>
+                <option value="5" selected>5 years</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="taxMode">Annual tax effect</label>
+              <select id="taxMode">
+                <option value="none">No tax adjustment</option>
+                <option value="paid">I paid taxes</option>
+                <option value="refund">I received a refund</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="field">
+            <label for="taxAmount">Annual tax amount</label>
+            <input id="taxAmount" type="number" step="0.01" min="0" placeholder="0.00" />
+          </div>
+        </div>
+
+        <div style="margin-top:22px;">
+          <div class="row-head">
+            <div class="row-title">Income sources</div>
+            <button class="secondary" type="button" id="addIncomeBtn">+ Add income source</button>
+          </div>
+          <div id="incomeList"></div>
+        </div>
+
+        <div style="margin-top:20px;">
+          <div class="row-head">
+            <div class="row-title">Monthly expenses</div>
+            <button class="secondary" type="button" id="addExpenseBtn">+ Add monthly expense</button>
+          </div>
+          <div id="expenseList"></div>
+        </div>
+
+        <div class="btn-row">
+          <button class="primary" type="button" id="calculateBtn">Calculate</button>
+          <button class="secondary" type="button" id="loadExampleBtn">Load my example structure</button>
+          <button class="secondary" type="button" id="resetBtn">Reset</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2 class="section-title">Results</h2>
+        <div class="subtext">This panel updates your annual and monthly savings view, with and without taxes included.</div>
+
+        <div class="result-grid">
+          <div class="result-card">
+            <h3>Annual income</h3>
+            <div class="result-value" id="annualIncomeValue">$0</div>
+            <div class="tiny-note">Total of all income sources entered.</div>
+          </div>
+          <div class="result-card">
+            <h3>Annual expenses</h3>
+            <div class="result-value" id="annualExpenseValue">$0</div>
+            <div class="tiny-note">Monthly expenses × 12 in year 1.</div>
+          </div>
+          <div class="result-card">
+            <h3>Annual savings (gross)</h3>
+            <div class="result-value" id="grossAnnualSavingsValue">$0</div>
+            <div class="tiny-note">Income minus annual expenses, before tax adjustment.</div>
+          </div>
+          <div class="result-card">
+            <h3>Annual savings (with taxes)</h3>
+            <div class="result-value" id="netAnnualSavingsValue">$0</div>
+            <div class="tiny-note">Gross result adjusted by taxes paid or refund received.</div>
+          </div>
+          <div class="result-card">
+            <h3>Monthly savings (gross)</h3>
+            <div class="result-value" id="grossMonthlySavingsValue">$0</div>
+            <div class="tiny-note">Annual gross savings divided by 12.</div>
+          </div>
+          <div class="result-card">
+            <h3>Monthly savings (with taxes)</h3>
+            <div class="result-value" id="netMonthlySavingsValue">$0</div>
+            <div class="tiny-note">Annual tax-adjusted savings divided by 12.</div>
+          </div>
+        </div>
+
+        <div class="bar-wrap">
+          <div class="bar-title">Year 1 money distribution</div>
+          <div class="bar" aria-label="Money distribution bar">
+            <div class="bar-income" id="barIncome"></div>
+            <div class="bar-expenses" id="barExpenses"></div>
+            <div class="bar-savings" id="barSavings"></div>
+          </div>
+          <div class="tiny-note" style="margin-top:8px;">
+            Blue = income, orange = expenses, green = gross savings. The savings segment is measured against income.
+          </div>
+        </div>
+
+        <div style="margin-top:18px;">
+          <div class="row-title" style="margin-bottom:10px;">Projection table</div>
+          <table>
+            <thead>
+              <tr>
+                <th>Year</th>
+                <th>Projected expenses</th>
+                <th>Gross savings</th>
+                <th>With taxes</th>
+              </tr>
+            </thead>
+            <tbody id="projectionBody">
+              <tr>
+                <td colspan="4" class="tiny-note">No data yet. Enter your information and calculate.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="footer-note" id="summaryText">
+          Waiting for data. This version assumes income stays constant unless you manually edit it. Expense increases are applied individually by expense.
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    const incomeList = document.getElementById('incomeList');
+    const expenseList = document.getElementById('expenseList');
+
+    const money = new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USD',
+      maximumFractionDigits: 2
+    });
+
+    let incomeCounter = 0;
+    let expenseCounter = 0;
+
+    function createIncomeRow(data = {}) {
+      incomeCounter += 1;
+      const row = document.createElement('div');
+      row.className = 'row-card income-row';
+      row.innerHTML = `
+        <div class="row-head">
+          <div class="row-title">Income Source ${incomeCounter}</div>
+          <button class="danger remove-row" type="button">Remove</button>
+        </div>
+        <div class="three-col">
+          <div class="field">
+            <label>Income name</label>
+            <input class="income-name" type="text" placeholder="Example: Main job" value="${escapeHtml(data.name || '')}" />
+          </div>
+          <div class="field">
+            <label>Type</label>
+            <select class="income-type">
+              <option value="salary" ${data.type === 'salary' ? 'selected' : ''}>Salary / fixed</option>
+              <option value="hourly" ${data.type === 'hourly' ? 'selected' : ''}>Hourly</option>
+              <option value="self-employed" ${data.type === 'self-employed' ? 'selected' : ''}>Self-employed / 1099</option>
+              <option value="side-income" ${data.type === 'side-income' ? 'selected' : ''}>Side income</option>
+              <option value="other" ${data.type === 'other' ? 'selected' : ''}>Other</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Annual amount</label>
+            <input class="income-amount" type="number" min="0" step="0.01" placeholder="0.00" value="${data.amount ?? ''}" />
+          </div>
+        </div>
+      `;
+      row.querySelector('.remove-row').addEventListener('click', () => {
+        row.remove();
+        calculate();
+      });
+      incomeList.appendChild(row);
+    }
+
+    function createExpenseRow(data = {}) {
+      expenseCounter += 1;
+      const row = document.createElement('div');
+      row.className = 'row-card expense-row';
+      row.innerHTML = `
+        <div class="row-head">
+          <div class="row-title">Expense ${expenseCounter}</div>
+          <button class="danger remove-row" type="button">Remove</button>
+        </div>
+        <div class="three-col">
+          <div class="field">
+            <label>Expense name</label>
+            <input class="expense-name" type="text" placeholder="Example: Rent" value="${escapeHtml(data.name || '')}" />
+          </div>
+          <div class="field">
+            <label>Category</label>
+            <select class="expense-category">
+              <option value="fixed" ${data.category === 'fixed' ? 'selected' : ''}>Fixed</option>
+              <option value="variable" ${data.category === 'variable' ? 'selected' : ''}>Variable</option>
+              <option value="debt" ${data.category === 'debt' ? 'selected' : ''}>Debt</option>
+              <option value="savings" ${data.category === 'savings' ? 'selected' : ''}>Savings allocation</option>
+              <option value="other" ${data.category === 'other' ? 'selected' : ''}>Other</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Monthly amount</label>
+            <input class="expense-amount" type="number" min="0" step="0.01" placeholder="0.00" value="${data.amount ?? ''}" />
+          </div>
+        </div>
+        <div class="two-col" style="margin-top:12px;">
+          <div class="field">
+            <label>Annual increase?</label>
+            <select class="expense-growth-enabled">
+              <option value="no" ${data.growthEnabled === false ? 'selected' : ''}>No</option>
+              <option value="yes" ${data.growthEnabled !== false ? 'selected' : ''}>Yes</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Annual increase %</label>
+            <input class="expense-growth" type="number" step="0.01" placeholder="0.00" value="${data.growth ?? ''}" />
+          </div>
+        </div>
+      `;
+      row.querySelector('.remove-row').addEventListener('click', () => {
+        row.remove();
+        calculate();
+      });
+      expenseList.appendChild(row);
+    }
+
+    function escapeHtml(str) {
+      return String(str)
+        .replaceAll('&', '&amp;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;')
+        .replaceAll('"', '&quot;')
+        .replaceAll("'", '&#039;');
+    }
+
+    function num(value) {
+      const n = parseFloat(value);
+      return Number.isFinite(n) ? n : 0;
+    }
+
+    function getIncomes() {
+      return [...document.querySelectorAll('.income-row')].map(row => ({
+        name: row.querySelector('.income-name').value.trim(),
+        type: row.querySelector('.income-type').value,
+        amount: num(row.querySelector('.income-amount').value)
+      }));
+    }
+
+    function getExpenses() {
+      return [...document.querySelectorAll('.expense-row')].map(row => ({
+        name: row.querySelector('.expense-name').value.trim(),
+        category: row.querySelector('.expense-category').value,
+        amount: num(row.querySelector('.expense-amount').value),
+        growthEnabled: row.querySelector('.expense-growth-enabled').value === 'yes',
+        growth: num(row.querySelector('.expense-growth').value)
+      }));
+    }
+
+    function computeProjectedAnnualExpenses(expenses, yearIndex) {
+      return expenses.reduce((total, expense) => {
+        const monthly = expense.amount;
+        const growthRate = expense.growthEnabled ? expense.growth / 100 : 0;
+        const projectedMonthly = monthly * Math.pow(1 + growthRate, yearIndex);
+        return total + projectedMonthly * 12;
+      }, 0);
+    }
+
+    function formatSignedCurrency(value) {
+      const formatted = money.format(Math.abs(value));
+      return value < 0 ? `-${formatted}` : formatted;
+    }
+
+    function applyValueTone(element, value) {
+      element.classList.remove('good', 'bad', 'warn');
+      if (value > 0) element.classList.add('good');
+      else if (value < 0) element.classList.add('bad');
+      else element.classList.add('warn');
+    }
+
+    function calculate() {
+      const incomes = getIncomes();
+      const expenses = getExpenses();
+      const annualIncome = incomes.reduce((sum, item) => sum + item.amount, 0);
+      const annualExpenses = computeProjectedAnnualExpenses(expenses, 0);
+      const grossAnnualSavings = annualIncome - annualExpenses;
+
+      const taxMode = document.getElementById('taxMode').value;
+      const taxAmount = num(document.getElementById('taxAmount').value);
+      let netAnnualSavings = grossAnnualSavings;
+      if (taxMode === 'paid') netAnnualSavings -= taxAmount;
+      if (taxMode === 'refund') netAnnualSavings += taxAmount;
+
+      const grossMonthlySavings = grossAnnualSavings / 12;
+      const netMonthlySavings = netAnnualSavings / 12;
+
+      updateValue('annualIncomeValue', annualIncome);
+      updateValue('annualExpenseValue', annualExpenses, false);
+      updateValue('grossAnnualSavingsValue', grossAnnualSavings);
+      updateValue('netAnnualSavingsValue', netAnnualSavings);
+      updateValue('grossMonthlySavingsValue', grossMonthlySavings);
+      updateValue('netMonthlySavingsValue', netMonthlySavings);
+
+      updateBar(annualIncome, annualExpenses, grossAnnualSavings);
+      updateProjectionTable(annualIncome, expenses, taxMode, taxAmount);
+      updateSummary(annualIncome, annualExpenses, grossAnnualSavings, netAnnualSavings, incomes.length, expenses.length);
+    }
+
+    function updateValue(id, value, tone = true) {
+      const el = document.getElementById(id);
+      el.textContent = formatSignedCurrency(value);
+      if (tone) applyValueTone(el, value);
+    }
+
+    function updateBar(annualIncome, annualExpenses, grossAnnualSavings) {
+      const incomeBar = document.getElementById('barIncome');
+      const expenseBar = document.getElementById('barExpenses');
+      const savingsBar = document.getElementById('barSavings');
+
+      if (annualIncome <= 0) {
+        incomeBar.style.width = '0%';
+        expenseBar.style.width = '0%';
+        savingsBar.style.width = '0%';
+        return;
+      }
+
+      incomeBar.style.width = '100%';
+      expenseBar.style.width = `${Math.min((annualExpenses / annualIncome) * 100, 100)}%`;
+      savingsBar.style.width = `${Math.max(Math.min((Math.max(grossAnnualSavings, 0) / annualIncome) * 100, 100), 0)}%`;
+    }
+
+    function updateProjectionTable(annualIncome, expenses, taxMode, taxAmount) {
+      const years = num(document.getElementById('projectionYears').value) || 5;
+      const body = document.getElementById('projectionBody');
+      body.innerHTML = '';
+
+      for (let year = 1; year <= years; year++) {
+        const projectedExpenses = computeProjectedAnnualExpenses(expenses, year - 1);
+        const grossSavings = annualIncome - projectedExpenses;
+        let withTaxes = grossSavings;
+        if (taxMode === 'paid') withTaxes -= taxAmount;
+        if (taxMode === 'refund') withTaxes += taxAmount;
+
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>Year ${year}</td>
+          <td>${formatSignedCurrency(projectedExpenses)}</td>
+          <td class="${grossSavings >= 0 ? 'good' : 'bad'}">${formatSignedCurrency(grossSavings)}</td>
+          <td class="${withTaxes >= 0 ? 'good' : 'bad'}">${formatSignedCurrency(withTaxes)}</td>
+        `;
+        body.appendChild(tr);
+      }
+
+      if (!body.innerHTML.trim()) {
+        body.innerHTML = '<tr><td colspan="4">No projection data.</td></tr>';
+      }
+    }
+
+    function updateSummary(annualIncome, annualExpenses, grossAnnualSavings, netAnnualSavings, incomeCount, expenseCount) {
+      const summary = document.getElementById('summaryText');
+      const name = document.getElementById('fullName').value.trim() || 'User';
+      const taxMode = document.getElementById('taxMode').value;
+      const taxLabel = taxMode === 'paid' ? 'taxes paid' : taxMode === 'refund' ? 'tax refund included' : 'no tax adjustment';
+
+      summary.textContent = `${name} currently has ${incomeCount} income source(s) and ${expenseCount} expense item(s). In year 1, annual income is ${formatSignedCurrency(annualIncome)}, annual expenses are ${formatSignedCurrency(annualExpenses)}, gross annual savings are ${formatSignedCurrency(grossAnnualSavings)}, and the adjusted annual result is ${formatSignedCurrency(netAnnualSavings)} with ${taxLabel}.`;
+    }
+
+    function resetAll() {
+      document.getElementById('fullName').value = '';
+      document.getElementById('profession').value = '';
+      document.getElementById('projectionYears').value = '5';
+      document.getElementById('taxMode').value = 'none';
+      document.getElementById('taxAmount').value = '';
+      incomeList.innerHTML = '';
+      expenseList.innerHTML = '';
+      incomeCounter = 0;
+      expenseCounter = 0;
+      createIncomeRow();
+      createExpenseRow();
+      calculate();
+    }
+
+    function loadExample() {
+      document.getElementById('fullName').value = 'Julio';
+      document.getElementById('profession').value = 'Multiple jobs / side income';
+      document.getElementById('projectionYears').value = '5';
+      document.getElementById('taxMode').value = 'refund';
+      document.getElementById('taxAmount').value = '2500';
+      incomeList.innerHTML = '';
+      expenseList.innerHTML = '';
+      incomeCounter = 0;
+      expenseCounter = 0;
+
+      createIncomeRow({ name: 'Main Job', type: 'salary', amount: 54000 });
+      createIncomeRow({ name: 'Second Job', type: 'hourly', amount: 18000 });
+      createIncomeRow({ name: 'Amazon Flex / Extra', type: 'side-income', amount: 9000 });
+
+      createExpenseRow({ name: 'Rent', category: 'fixed', amount: 1800, growthEnabled: true, growth: 5 });
+      createExpenseRow({ name: 'Car Payment', category: 'fixed', amount: 740, growthEnabled: false, growth: 0 });
+      createExpenseRow({ name: 'Car Insurance', category: 'fixed', amount: 260, growthEnabled: true, growth: 6 });
+      createExpenseRow({ name: 'Gas', category: 'variable', amount: 420, growthEnabled: true, growth: 4 });
+      createExpenseRow({ name: 'Food', category: 'variable', amount: 650, growthEnabled: true, growth: 4 });
+      createExpenseRow({ name: 'Phone + Internet', category: 'fixed', amount: 180, growthEnabled: true, growth: 3 });
+      createExpenseRow({ name: 'Subscriptions / Other', category: 'other', amount: 120, growthEnabled: false, growth: 0 });
+
+      calculate();
+    }
+
+    document.getElementById('addIncomeBtn').addEventListener('click', () => createIncomeRow());
+    document.getElementById('addExpenseBtn').addEventListener('click', () => createExpenseRow());
+    document.getElementById('calculateBtn').addEventListener('click', calculate);
+    document.getElementById('loadExampleBtn').addEventListener('click', loadExample);
+    document.getElementById('resetBtn').addEventListener('click', resetAll);
+
+    document.addEventListener('input', (e) => {
+      if (e.target.matches('input, select')) calculate();
+    });
+    document.addEventListener('change', (e) => {
+      if (e.target.matches('input, select')) calculate();
+    });
+
+    createIncomeRow();
+    createExpenseRow();
+    calculate();
+  </script>
+</body>
+</html>
