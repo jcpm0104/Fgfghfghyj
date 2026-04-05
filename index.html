@@ -566,7 +566,7 @@
           <div id="step2" class="step-panel" style="display:none;">
             <div class="eyebrow">Step 2</div>
             <h3>Add your annual income sources</h3>
-            <p class="sub">New income forms appear first at the top. Once saved, each item collapses into a clean summary card below it.</p>
+            <p class="sub">Add an income and press SAVE. Each saved item will appear below. Repeat to add more.</p>
 
             <div id="incomeComposer" class="composer">
               <div class="grid-2">
@@ -595,7 +595,7 @@
           <div id="step3" class="step-panel" style="display:none;">
             <div class="eyebrow">Step 3</div>
             <h3>Add your monthly expenses</h3>
-            <p class="sub">Each expense can optionally increase every year by a percentage. This is what powers the future projection.</p>
+            <p class="sub">Add an expense and press SAVE. Each saved item will appear below. Repeat to add more. You can optionally set annual increase.</p>
 
             <div id="expenseComposer" class="composer">
               <div class="grid-2">
@@ -1000,21 +1000,54 @@
   }
 
   function drawChart(projection){
-    const canvas = document.getElementById('projectionChart');
-    const ctx = canvas.getContext('2d');
+  const canvas = document.getElementById('projectionChart');
+  const ctx = canvas.getContext('2d');
 
-    const dpr = window.devicePixelRatio || 1;
-    const rect = canvas.getBoundingClientRect();
-    canvas.width = rect.width * dpr;
-    canvas.height = 320 * dpr;
-    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  // FIX: force real size (prevents black chart)
+  canvas.width = canvas.offsetWidth;
+  canvas.height = 320;
 
-    const width = rect.width;
-    const height = 320;
+  ctx.clearRect(0,0,canvas.width,canvas.height);
 
-    ctx.clearRect(0,0,width,height);
+  const width = canvas.width;
+  const height = canvas.height;
 
-    const pad = {top:18,right:16,bottom:36,left:68};
+  const pad = {top:20,left:60,right:20,bottom:40};
+  const chartW = width - pad.left - pad.right;
+  const chartH = height - pad.top - pad.bottom;
+
+  const income = projection.map(p=>p.income);
+  const expenses = projection.map(p=>p.expenses);
+  const savings = projection.map(p=>p.adjusted);
+
+  const max = Math.max(...income, ...expenses, ...savings);
+  const min = Math.min(0, ...income, ...expenses, ...savings);
+
+  function x(i){
+    return pad.left + (chartW * i / (projection.length - 1 || 1));
+  }
+
+  function y(v){
+    return pad.top + chartH - ((v - min) / (max - min)) * chartH;
+  }
+
+  function drawLine(data, color){
+    ctx.beginPath();
+    ctx.strokeStyle = color;
+    ctx.lineWidth = 3;
+
+    data.forEach((v,i)=>{
+      if(i===0) ctx.moveTo(x(i), y(v));
+      else ctx.lineTo(x(i), y(v));
+    });
+
+    ctx.stroke();
+  }
+
+  drawLine(income, "#4da3ff");
+  drawLine(expenses, "#ff9f50");
+  drawLine(savings, "#55d6a1");
+};
     const chartW = width - pad.left - pad.right;
     const chartH = height - pad.top - pad.bottom;
 
