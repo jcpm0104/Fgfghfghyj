@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Future Capital - Savings Calculator v1</title>
+  <title>Future Capital - Savings Calculator v2</title>
   <style>
     :root {
       --bg: #081224;
@@ -18,7 +18,7 @@
       --warn: #f59e0b;
       --bad: #fb7185;
       --shadow: 0 18px 40px rgba(0,0,0,0.35);
-      --radius: 18px;
+      --radius: 20px;
     }
 
     * { box-sizing: border-box; }
@@ -35,20 +35,16 @@
     }
 
     .wrap {
-      width: min(1280px, calc(100% - 28px));
+      width: min(1120px, calc(100% - 26px));
       margin: 0 auto;
-      padding: 28px 0 56px;
+      padding: 24px 0 56px;
     }
 
-    .hero {
-      display: grid;
-      grid-template-columns: 1.35fr 0.9fr;
-      gap: 18px;
-      align-items: stretch;
-      margin-bottom: 18px;
-    }
-
-    .hero-card, .card {
+    .hero,
+    .wizard-card,
+    .results-card,
+    .quick-card,
+    .item-card {
       background: var(--card);
       border: 1px solid var(--card-border);
       border-radius: var(--radius);
@@ -56,8 +52,13 @@
       backdrop-filter: blur(10px);
     }
 
-    .hero-card {
-      padding: 28px;
+    .hero {
+      padding: 24px;
+      margin-bottom: 18px;
+      display: grid;
+      grid-template-columns: 1.2fr .8fr;
+      gap: 16px;
+      align-items: stretch;
     }
 
     .brand {
@@ -76,66 +77,127 @@
 
     h1 {
       margin: 0 0 10px;
-      font-size: clamp(34px, 5vw, 56px);
+      font-size: clamp(32px, 5vw, 56px);
       line-height: 0.98;
       letter-spacing: -1.6px;
     }
 
-    .hero p {
-      margin: 0;
+    h2, h3, p { margin-top: 0; }
+
+    .hero p,
+    .subtext,
+    .tiny-note,
+    .summary-text,
+    .empty-text {
       color: var(--muted);
       line-height: 1.6;
-      font-size: 15px;
     }
 
-    .quick-stats {
-      padding: 22px;
+    .hero-side {
       display: grid;
-      grid-template-columns: 1fr;
       gap: 12px;
     }
 
-    .mini {
-      background: rgba(255,255,255,0.06);
-      border: 1px solid rgba(255,255,255,0.08);
-      border-radius: 14px;
+    .quick-card {
       padding: 16px;
     }
 
-    .mini-label {
+    .quick-label {
       font-size: 12px;
       color: var(--muted);
-      margin-bottom: 6px;
       text-transform: uppercase;
-      letter-spacing: 0.9px;
+      letter-spacing: .9px;
+      margin-bottom: 6px;
     }
 
-    .mini-value {
+    .quick-value {
       font-size: 24px;
       font-weight: 800;
     }
 
-    .grid {
+    .wizard-layout {
       display: grid;
-      grid-template-columns: 1.15fr 0.85fr;
+      grid-template-columns: minmax(0, 1fr) minmax(300px, 360px);
       gap: 18px;
+      align-items: start;
     }
 
-    .card {
+    .wizard-card,
+    .results-card {
       padding: 20px;
     }
 
-    .section-title {
-      margin: 0 0 14px;
-      font-size: 22px;
-      letter-spacing: -0.5px;
+    .stepper {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 10px;
+      margin-bottom: 18px;
     }
 
-    .subtext {
+    .step-pill {
+      border-radius: 14px;
+      padding: 12px;
+      border: 1px solid rgba(255,255,255,0.08);
+      background: rgba(255,255,255,0.04);
+      min-height: 74px;
+    }
+
+    .step-pill.active {
+      border-color: rgba(78,161,255,0.45);
+      box-shadow: inset 0 0 0 1px rgba(78,161,255,0.2), 0 8px 20px rgba(46,121,255,0.14);
+      background: rgba(78,161,255,0.1);
+    }
+
+    .step-pill.done {
+      background: rgba(74, 222, 128, 0.08);
+      border-color: rgba(74, 222, 128, 0.25);
+    }
+
+    .step-number {
+      width: 28px;
+      height: 28px;
+      border-radius: 999px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(255,255,255,0.08);
+      font-size: 13px;
+      font-weight: 800;
+      margin-bottom: 10px;
+    }
+
+    .step-pill.active .step-number {
+      background: rgba(78,161,255,0.18);
+      color: white;
+    }
+
+    .step-title {
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+
+    .step-sub {
       color: var(--muted);
-      font-size: 14px;
-      line-height: 1.55;
-      margin-bottom: 18px;
+      font-size: 12px;
+      line-height: 1.35;
+    }
+
+    .panel {
+      display: none;
+      animation: fadeIn .22s ease;
+    }
+
+    .panel.active { display: block; }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .section-title {
+      margin-bottom: 8px;
+      font-size: 24px;
+      letter-spacing: -.5px;
     }
 
     .fields, .two-col, .three-col {
@@ -173,34 +235,53 @@
       box-shadow: 0 0 0 3px rgba(78,161,255,0.16);
     }
 
-    .row-card {
-      background: rgba(255,255,255,0.05);
-      border: 1px solid rgba(255,255,255,0.08);
-      border-radius: 16px;
-      padding: 14px;
-      margin-bottom: 12px;
-    }
-
-    .row-head {
+    .toolbar {
       display: flex;
+      flex-wrap: wrap;
       align-items: center;
       justify-content: space-between;
       gap: 10px;
-      margin-bottom: 10px;
+      margin-bottom: 14px;
     }
 
-    .row-title {
-      font-size: 14px;
+    .item-card {
+      padding: 14px;
+      margin-bottom: 12px;
+      background: rgba(255,255,255,0.055);
+      border: 1px solid rgba(255,255,255,0.08);
+    }
+
+    .item-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .item-title {
+      font-size: 20px;
       color: var(--accent2);
-      font-weight: 700;
-      letter-spacing: 0.3px;
+      font-weight: 800;
+      letter-spacing: .2px;
+      margin-bottom: 4px;
     }
 
-    .btn-row {
+    .item-summary {
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.45;
+      max-width: 560px;
+    }
+
+    .item-body { display: block; }
+    .item-card.collapsed .item-body { display: none; }
+
+    .actions {
       display: flex;
       flex-wrap: wrap;
-      gap: 10px;
-      margin-top: 10px;
+      gap: 8px;
+      justify-content: flex-end;
     }
 
     button {
@@ -232,13 +313,32 @@
       background: rgba(251,113,133,0.13);
       color: #ffd1d9;
       border: 1px solid rgba(251,113,133,0.26);
-      padding: 9px 12px;
-      font-size: 13px;
+    }
+
+    .ghost {
+      background: transparent;
+      color: var(--accent2);
+      border: 1px solid rgba(124,196,255,0.26);
+    }
+
+    .panel-nav,
+    .bottom-actions {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: 10px;
+      margin-top: 18px;
+    }
+
+    .right-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
     }
 
     .result-grid {
       display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
+      grid-template-columns: 1fr;
       gap: 12px;
       margin-bottom: 16px;
     }
@@ -266,26 +366,14 @@
       margin-bottom: 6px;
     }
 
-    .tiny-note {
-      font-size: 12px;
-      color: var(--muted);
-      line-height: 1.45;
-    }
-
     .good { color: var(--good); }
     .bad { color: var(--bad); }
     .warn { color: var(--warn); }
 
     .bar-wrap {
-      margin-top: 18px;
-      padding-top: 10px;
+      margin-top: 16px;
+      padding-top: 14px;
       border-top: 1px solid rgba(255,255,255,0.08);
-    }
-
-    .bar-title {
-      margin-bottom: 8px;
-      font-size: 14px;
-      color: var(--muted);
     }
 
     .bar {
@@ -295,15 +383,18 @@
       display: flex;
       background: rgba(255,255,255,0.08);
       border: 1px solid rgba(255,255,255,0.08);
+      margin-top: 8px;
     }
 
-    .bar-income, .bar-expenses, .bar-savings {
-      height: 100%;
-    }
-
+    .bar-income, .bar-expenses, .bar-savings { height: 100%; }
     .bar-income { background: #5db4ff; }
     .bar-expenses { background: #f59e0b; }
     .bar-savings { background: #4ade80; }
+
+    .table-wrap {
+      overflow-x: auto;
+      margin-top: 14px;
+    }
 
     table {
       width: 100%;
@@ -330,115 +421,186 @@
 
     tr:last-child td { border-bottom: none; }
 
-    .footer-note {
+    .summary-box {
       margin-top: 16px;
-      font-size: 12px;
-      color: var(--muted);
-      line-height: 1.55;
+      padding: 14px;
+      border-radius: 16px;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.08);
+    }
+
+    .sticky-summary {
+      position: sticky;
+      top: 18px;
+      display: none;
+    }
+
+    .sticky-summary.visible {
+      display: block;
+    }
+
+    .empty-text {
+      padding: 14px;
+      border-radius: 14px;
+      background: rgba(255,255,255,0.04);
+      border: 1px dashed rgba(255,255,255,0.12);
+      font-size: 14px;
     }
 
     @media (max-width: 980px) {
-      .hero, .grid { grid-template-columns: 1fr; }
-      .two-col, .three-col, .result-grid { grid-template-columns: 1fr; }
+      .hero,
+      .wizard-layout {
+        grid-template-columns: 1fr;
+      }
+
+      .stepper,
+      .two-col,
+      .three-col {
+        grid-template-columns: 1fr;
+      }
+
+      .sticky-summary { position: static; }
     }
   </style>
 </head>
 <body>
   <div class="wrap">
     <section class="hero">
-      <div class="hero-card">
-        <div class="brand">Future Capital • Savings Calculator v1</div>
-        <h1>Build your real savings picture.</h1>
+      <div>
+        <div class="brand">Future Capital • Savings Calculator v2</div>
+        <h1>Wizard flow, cleaner inputs, same math.</h1>
         <p>
-          This first version lets you enter multiple income sources, monthly expenses, annual increases for each expense,
-          and the real impact of taxes paid or refunded. It shows a gross result and a tax-adjusted result so you can
-          test whether the math matches real life.
+          This version keeps your savings logic exactly focused on bank-account cash left over. Investments still count as an
+          outgoing monthly amount for this calculator. The improvement is the experience: step-by-step screens, collapsible
+          income and expense cards, and a much cleaner workflow on mobile.
         </p>
       </div>
-      <div class="hero-card quick-stats">
-        <div class="mini">
-          <div class="mini-label">What it calculates</div>
-          <div class="mini-value">Income vs Expenses</div>
+      <div class="hero-side">
+        <div class="quick-card">
+          <div class="quick-label">Flow</div>
+          <div class="quick-value">Profile → Income → Expenses → Results</div>
         </div>
-        <div class="mini">
-          <div class="mini-label">Tax mode</div>
-          <div class="mini-value">Paid or Refunded</div>
+        <div class="quick-card">
+          <div class="quick-label">Item behavior</div>
+          <div class="quick-value">Save / collapse / reopen</div>
         </div>
-        <div class="mini">
-          <div class="mini-label">Projection</div>
-          <div class="mini-value">Up to 5 Years</div>
+        <div class="quick-card">
+          <div class="quick-label">Math</div>
+          <div class="quick-value">Unchanged from v1</div>
         </div>
       </div>
     </section>
 
-    <section class="grid">
-      <div class="card">
-        <h2 class="section-title">Inputs</h2>
-        <div class="subtext">Fill out your personal case first. Later this can be expanded into the public/pro version.</div>
+    <section class="wizard-layout">
+      <div class="wizard-card">
+        <div class="stepper" id="stepper"></div>
 
-        <div class="fields">
-          <div class="two-col">
-            <div class="field">
-              <label for="fullName">Your name</label>
-              <input id="fullName" type="text" placeholder="Example: Julio Perera" />
+        <div class="panel active" data-step="0">
+          <h2 class="section-title">Step 1 — Profile and tax settings</h2>
+          <div class="subtext">Enter your base identity, projection length, and how you want the app to treat the annual tax effect.</div>
+          <div class="fields">
+            <div class="two-col">
+              <div class="field">
+                <label for="fullName">Your name</label>
+                <input id="fullName" type="text" placeholder="Example: Julio Perera" />
+              </div>
+              <div class="field">
+                <label for="profession">Profession / what you do</label>
+                <input id="profession" type="text" placeholder="Example: Amazon Flex, trading" />
+              </div>
             </div>
+
+            <div class="two-col">
+              <div class="field">
+                <label for="projectionYears">Projection years</label>
+                <select id="projectionYears">
+                  <option value="1">1 year</option>
+                  <option value="3">3 years</option>
+                  <option value="5" selected>5 years</option>
+                </select>
+              </div>
+              <div class="field">
+                <label for="taxMode">Annual tax effect</label>
+                <select id="taxMode">
+                  <option value="none">No tax adjustment</option>
+                  <option value="paid">I paid taxes</option>
+                  <option value="refund">I received a refund</option>
+                </select>
+              </div>
+            </div>
+
             <div class="field">
-              <label for="profession">Profession / what you do</label>
-              <input id="profession" type="text" placeholder="Example: W-2 worker, Amazon Flex, trading" />
+              <label for="taxAmount">Annual tax amount</label>
+              <input id="taxAmount" type="number" step="0.01" min="0" placeholder="0.00" />
             </div>
           </div>
 
-          <div class="two-col">
-            <div class="field">
-              <label for="projectionYears">Projection years</label>
-              <select id="projectionYears">
-                <option value="1">1 year</option>
-                <option value="3">3 years</option>
-                <option value="5" selected>5 years</option>
-              </select>
+          <div class="panel-nav">
+            <div></div>
+            <div class="right-actions">
+              <button class="primary next-btn" type="button">Next: Income</button>
             </div>
-            <div class="field">
-              <label for="taxMode">Annual tax effect</label>
-              <select id="taxMode">
-                <option value="none">No tax adjustment</option>
-                <option value="paid">I paid taxes</option>
-                <option value="refund">I received a refund</option>
-              </select>
-            </div>
-          </div>
-
-          <div class="field">
-            <label for="taxAmount">Annual tax amount</label>
-            <input id="taxAmount" type="number" step="0.01" min="0" placeholder="0.00" />
           </div>
         </div>
 
-        <div style="margin-top:22px;">
-          <div class="row-head">
-            <div class="row-title">Income sources</div>
+        <div class="panel" data-step="1">
+          <div class="toolbar">
+            <div>
+              <h2 class="section-title" style="margin-bottom:6px;">Step 2 — Income sources</h2>
+              <div class="subtext" style="margin-bottom:0;">Add your incomes one by one. When you finish one, tap Save & collapse so the page stays short and clean.</div>
+            </div>
             <button class="secondary" type="button" id="addIncomeBtn">+ Add income source</button>
           </div>
           <div id="incomeList"></div>
+          <div class="empty-text" id="incomeEmpty">No income sources yet. Add at least one.</div>
+
+          <div class="panel-nav">
+            <button class="secondary prev-btn" type="button">Back</button>
+            <div class="right-actions">
+              <button class="ghost" type="button" id="expandAllIncomesBtn">Show all inputs</button>
+              <button class="primary next-btn" type="button">Next: Expenses</button>
+            </div>
+          </div>
         </div>
 
-        <div style="margin-top:20px;">
-          <div class="row-head">
-            <div class="row-title">Monthly expenses</div>
+        <div class="panel" data-step="2">
+          <div class="toolbar">
+            <div>
+              <h2 class="section-title" style="margin-bottom:6px;">Step 3 — Monthly expenses</h2>
+              <div class="subtext" style="margin-bottom:0;">Add every monthly outflow that reduces what stays in your bank account. Keep investments here too, since that is the behavior you want.</div>
+            </div>
             <button class="secondary" type="button" id="addExpenseBtn">+ Add monthly expense</button>
           </div>
           <div id="expenseList"></div>
+          <div class="empty-text" id="expenseEmpty">No monthly expenses yet. Add at least one.</div>
+
+          <div class="panel-nav">
+            <button class="secondary prev-btn" type="button">Back</button>
+            <div class="right-actions">
+              <button class="ghost" type="button" id="expandAllExpensesBtn">Show all inputs</button>
+              <button class="primary next-btn" type="button">Next: Results</button>
+            </div>
+          </div>
         </div>
 
-        <div class="btn-row">
-          <button class="primary" type="button" id="calculateBtn">Calculate</button>
-          <button class="secondary" type="button" id="loadExampleBtn">Load my example structure</button>
-          <button class="secondary" type="button" id="resetBtn">Reset</button>
+        <div class="panel" data-step="3">
+          <h2 class="section-title">Step 4 — Results and projection</h2>
+          <div class="subtext">Your math updates live. This screen is focused on reviewing the annual and monthly outcome plus the year-by-year projection.</div>
+
+          <div class="bottom-actions">
+            <div class="right-actions">
+              <button class="secondary prev-btn" type="button">Back</button>
+              <button class="primary" type="button" id="calculateBtn">Recalculate</button>
+              <button class="secondary" type="button" id="loadExampleBtn">Load my example structure</button>
+            </div>
+            <button class="secondary" type="button" id="resetBtn">Reset</button>
+          </div>
         </div>
       </div>
 
-      <div class="card">
+      <aside class="results-card sticky-summary">
         <h2 class="section-title">Results</h2>
-        <div class="subtext">This panel updates your annual and monthly savings view, with and without taxes included.</div>
+        <div class="subtext">Math stays aligned with v1. Only the experience changed.</div>
 
         <div class="result-grid">
           <div class="result-card">
@@ -474,19 +636,16 @@
         </div>
 
         <div class="bar-wrap">
-          <div class="bar-title">Year 1 money distribution</div>
+          <div class="tiny-note">Year 1 money distribution</div>
           <div class="bar" aria-label="Money distribution bar">
             <div class="bar-income" id="barIncome"></div>
             <div class="bar-expenses" id="barExpenses"></div>
             <div class="bar-savings" id="barSavings"></div>
           </div>
-          <div class="tiny-note" style="margin-top:8px;">
-            Blue = income, orange = expenses, green = gross savings. The savings segment is measured against income.
-          </div>
+          <div class="tiny-note" style="margin-top:8px;">Blue = income, orange = expenses, green = gross savings.</div>
         </div>
 
-        <div style="margin-top:18px;">
-          <div class="row-title" style="margin-bottom:10px;">Projection table</div>
+        <div class="table-wrap">
           <table>
             <thead>
               <tr>
@@ -504,16 +663,30 @@
           </table>
         </div>
 
-        <div class="footer-note" id="summaryText">
-          Waiting for data. This version assumes income stays constant unless you manually edit it. Expense increases are applied individually by expense.
+        <div class="summary-box">
+          <div class="summary-text" id="summaryText">
+            Waiting for data. This version assumes income stays constant unless you manually edit it. Expense increases are applied individually by expense.
+          </div>
         </div>
-      </div>
+      </aside>
     </section>
   </div>
 
   <script>
     const incomeList = document.getElementById('incomeList');
     const expenseList = document.getElementById('expenseList');
+    const incomeEmpty = document.getElementById('incomeEmpty');
+    const expenseEmpty = document.getElementById('expenseEmpty');
+    const panels = [...document.querySelectorAll('.panel')];
+    const stepper = document.getElementById('stepper');
+    const resultsAside = document.querySelector('.sticky-summary');
+
+    const steps = [
+      { title: 'Profile', sub: 'Name, years, taxes' },
+      { title: 'Income', sub: 'Add and collapse sources' },
+      { title: 'Expenses', sub: 'Monthly outgoing items' },
+      { title: 'Results', sub: 'Savings and projection' }
+    ];
 
     const money = new Intl.NumberFormat('en-US', {
       style: 'currency',
@@ -523,92 +696,24 @@
 
     let incomeCounter = 0;
     let expenseCounter = 0;
+    let currentStep = 0;
 
-    function createIncomeRow(data = {}) {
-      incomeCounter += 1;
-      const row = document.createElement('div');
-      row.className = 'row-card income-row';
-      row.innerHTML = `
-        <div class="row-head">
-          <div class="row-title">Income Source ${incomeCounter}</div>
-          <button class="danger remove-row" type="button">Remove</button>
+    function renderStepper() {
+      stepper.innerHTML = steps.map((step, index) => `
+        <div class="step-pill ${index === currentStep ? 'active' : ''} ${index < currentStep ? 'done' : ''}">
+          <div class="step-number">${index + 1}</div>
+          <div class="step-title">${step.title}</div>
+          <div class="step-sub">${step.sub}</div>
         </div>
-        <div class="three-col">
-          <div class="field">
-            <label>Income name</label>
-            <input class="income-name" type="text" placeholder="Example: Main job" value="${escapeHtml(data.name || '')}" />
-          </div>
-          <div class="field">
-            <label>Type</label>
-            <select class="income-type">
-              <option value="salary" ${data.type === 'salary' ? 'selected' : ''}>Salary / fixed</option>
-              <option value="hourly" ${data.type === 'hourly' ? 'selected' : ''}>Hourly</option>
-              <option value="self-employed" ${data.type === 'self-employed' ? 'selected' : ''}>Self-employed / 1099</option>
-              <option value="side-income" ${data.type === 'side-income' ? 'selected' : ''}>Side income</option>
-              <option value="other" ${data.type === 'other' ? 'selected' : ''}>Other</option>
-            </select>
-          </div>
-          <div class="field">
-            <label>Annual amount</label>
-            <input class="income-amount" type="number" min="0" step="0.01" placeholder="0.00" value="${data.amount ?? ''}" />
-          </div>
-        </div>
-      `;
-      row.querySelector('.remove-row').addEventListener('click', () => {
-        row.remove();
-        calculate();
-      });
-      incomeList.appendChild(row);
+      `).join('');
     }
 
-    function createExpenseRow(data = {}) {
-      expenseCounter += 1;
-      const row = document.createElement('div');
-      row.className = 'row-card expense-row';
-      row.innerHTML = `
-        <div class="row-head">
-          <div class="row-title">Expense ${expenseCounter}</div>
-          <button class="danger remove-row" type="button">Remove</button>
-        </div>
-        <div class="three-col">
-          <div class="field">
-            <label>Expense name</label>
-            <input class="expense-name" type="text" placeholder="Example: Rent" value="${escapeHtml(data.name || '')}" />
-          </div>
-          <div class="field">
-            <label>Category</label>
-            <select class="expense-category">
-              <option value="fixed" ${data.category === 'fixed' ? 'selected' : ''}>Fixed</option>
-              <option value="variable" ${data.category === 'variable' ? 'selected' : ''}>Variable</option>
-              <option value="debt" ${data.category === 'debt' ? 'selected' : ''}>Debt</option>
-              <option value="savings" ${data.category === 'savings' ? 'selected' : ''}>Savings allocation</option>
-              <option value="other" ${data.category === 'other' ? 'selected' : ''}>Other</option>
-            </select>
-          </div>
-          <div class="field">
-            <label>Monthly amount</label>
-            <input class="expense-amount" type="number" min="0" step="0.01" placeholder="0.00" value="${data.amount ?? ''}" />
-          </div>
-        </div>
-        <div class="two-col" style="margin-top:12px;">
-          <div class="field">
-            <label>Annual increase?</label>
-            <select class="expense-growth-enabled">
-              <option value="no" ${data.growthEnabled === false ? 'selected' : ''}>No</option>
-              <option value="yes" ${data.growthEnabled !== false ? 'selected' : ''}>Yes</option>
-            </select>
-          </div>
-          <div class="field">
-            <label>Annual increase %</label>
-            <input class="expense-growth" type="number" step="0.01" placeholder="0.00" value="${data.growth ?? ''}" />
-          </div>
-        </div>
-      `;
-      row.querySelector('.remove-row').addEventListener('click', () => {
-        row.remove();
-        calculate();
-      });
-      expenseList.appendChild(row);
+    function showStep(index) {
+      currentStep = Math.max(0, Math.min(index, panels.length - 1));
+      panels.forEach((panel, panelIndex) => panel.classList.toggle('active', panelIndex === currentStep));
+      resultsAside.classList.toggle('visible', currentStep === 3);
+      renderStepper();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
     function escapeHtml(str) {
@@ -623,6 +728,198 @@
     function num(value) {
       const n = parseFloat(value);
       return Number.isFinite(n) ? n : 0;
+    }
+
+    function formatSignedCurrency(value) {
+      const formatted = money.format(Math.abs(value));
+      return value < 0 ? `-${formatted}` : formatted;
+    }
+
+    function applyValueTone(element, value) {
+      element.classList.remove('good', 'bad', 'warn');
+      if (value > 0) element.classList.add('good');
+      else if (value < 0) element.classList.add('bad');
+      else element.classList.add('warn');
+    }
+
+    function summarizeIncome(row) {
+      const name = row.querySelector('.income-name').value.trim() || 'Unnamed income';
+      const type = row.querySelector('.income-type').selectedOptions[0].textContent;
+      const amount = num(row.querySelector('.income-amount').value);
+      row.querySelector('.item-title').textContent = name;
+      row.querySelector('.item-summary').textContent = `${type} • ${formatSignedCurrency(amount)} annually`;
+    }
+
+    function summarizeExpense(row) {
+      const name = row.querySelector('.expense-name').value.trim() || 'Unnamed expense';
+      const category = row.querySelector('.expense-category').selectedOptions[0].textContent;
+      const amount = num(row.querySelector('.expense-amount').value);
+      const growthEnabled = row.querySelector('.expense-growth-enabled').value === 'yes';
+      const growth = num(row.querySelector('.expense-growth').value);
+      const growthText = growthEnabled ? ` • ${growth.toFixed(2)}% annual increase` : ' • no annual increase';
+      row.querySelector('.item-title').textContent = name;
+      row.querySelector('.item-summary').textContent = `${category} • ${formatSignedCurrency(amount)} monthly${growthText}`;
+    }
+
+    function collapseRow(row) {
+      row.classList.add('collapsed');
+      const toggleBtn = row.querySelector('.toggle-btn');
+      if (toggleBtn) toggleBtn.textContent = 'Show inputs';
+    }
+
+    function expandRow(row) {
+      row.classList.remove('collapsed');
+      const toggleBtn = row.querySelector('.toggle-btn');
+      if (toggleBtn) toggleBtn.textContent = 'Hide inputs';
+    }
+
+    function toggleRow(row) {
+      if (row.classList.contains('collapsed')) expandRow(row);
+      else collapseRow(row);
+    }
+
+    function syncEmptyStates() {
+      incomeEmpty.style.display = incomeList.children.length ? 'none' : 'block';
+      expenseEmpty.style.display = expenseList.children.length ? 'none' : 'block';
+    }
+
+    function createIncomeRow(data = {}) {
+      incomeCounter += 1;
+      const row = document.createElement('div');
+      row.className = 'item-card income-row';
+      row.innerHTML = `
+        <div class="item-header">
+          <div>
+            <div class="item-title">Income Source ${incomeCounter}</div>
+            <div class="item-summary">Add the name, type, and annual amount.</div>
+          </div>
+          <div class="actions">
+            <button class="ghost save-btn" type="button">Save & collapse</button>
+            <button class="secondary toggle-btn" type="button">Hide inputs</button>
+            <button class="danger remove-row" type="button">Remove</button>
+          </div>
+        </div>
+        <div class="item-body">
+          <div class="three-col">
+            <div class="field">
+              <label>Income name</label>
+              <input class="income-name" type="text" placeholder="Example: Main job" value="${escapeHtml(data.name || '')}" />
+            </div>
+            <div class="field">
+              <label>Type</label>
+              <select class="income-type">
+                <option value="salary" ${data.type === 'salary' ? 'selected' : ''}>Salary / fixed</option>
+                <option value="hourly" ${data.type === 'hourly' ? 'selected' : ''}>Hourly</option>
+                <option value="self-employed" ${data.type === 'self-employed' ? 'selected' : ''}>Self-employed / 1099</option>
+                <option value="side-income" ${data.type === 'side-income' ? 'selected' : ''}>Side income</option>
+                <option value="other" ${data.type === 'other' ? 'selected' : ''}>Other</option>
+              </select>
+            </div>
+            <div class="field">
+              <label>Annual amount</label>
+              <input class="income-amount" type="number" min="0" step="0.01" placeholder="0.00" value="${data.amount ?? ''}" />
+            </div>
+          </div>
+        </div>
+      `;
+
+      row.querySelector('.remove-row').addEventListener('click', () => {
+        row.remove();
+        calculate();
+        syncEmptyStates();
+      });
+      row.querySelector('.toggle-btn').addEventListener('click', () => toggleRow(row));
+      row.querySelector('.save-btn').addEventListener('click', () => {
+        summarizeIncome(row);
+        collapseRow(row);
+        calculate();
+      });
+      row.querySelectorAll('input, select').forEach(el => {
+        el.addEventListener('input', () => summarizeIncome(row));
+        el.addEventListener('change', () => summarizeIncome(row));
+      });
+
+      incomeList.appendChild(row);
+      summarizeIncome(row);
+      if (data.collapsed) collapseRow(row);
+      syncEmptyStates();
+      return row;
+    }
+
+    function createExpenseRow(data = {}) {
+      expenseCounter += 1;
+      const row = document.createElement('div');
+      row.className = 'item-card expense-row';
+      row.innerHTML = `
+        <div class="item-header">
+          <div>
+            <div class="item-title">Expense ${expenseCounter}</div>
+            <div class="item-summary">Add the name, category, monthly amount, and optional annual increase.</div>
+          </div>
+          <div class="actions">
+            <button class="ghost save-btn" type="button">Save & collapse</button>
+            <button class="secondary toggle-btn" type="button">Hide inputs</button>
+            <button class="danger remove-row" type="button">Remove</button>
+          </div>
+        </div>
+        <div class="item-body">
+          <div class="three-col">
+            <div class="field">
+              <label>Expense name</label>
+              <input class="expense-name" type="text" placeholder="Example: Rent" value="${escapeHtml(data.name || '')}" />
+            </div>
+            <div class="field">
+              <label>Category</label>
+              <select class="expense-category">
+                <option value="fixed" ${data.category === 'fixed' ? 'selected' : ''}>Fixed</option>
+                <option value="variable" ${data.category === 'variable' ? 'selected' : ''}>Variable</option>
+                <option value="debt" ${data.category === 'debt' ? 'selected' : ''}>Debt</option>
+                <option value="savings" ${data.category === 'savings' ? 'selected' : ''}>Savings allocation</option>
+                <option value="other" ${data.category === 'other' ? 'selected' : ''}>Other</option>
+              </select>
+            </div>
+            <div class="field">
+              <label>Monthly amount</label>
+              <input class="expense-amount" type="number" min="0" step="0.01" placeholder="0.00" value="${data.amount ?? ''}" />
+            </div>
+          </div>
+          <div class="two-col" style="margin-top:12px;">
+            <div class="field">
+              <label>Annual increase?</label>
+              <select class="expense-growth-enabled">
+                <option value="no" ${data.growthEnabled === false ? 'selected' : ''}>No</option>
+                <option value="yes" ${data.growthEnabled !== false ? 'selected' : ''}>Yes</option>
+              </select>
+            </div>
+            <div class="field">
+              <label>Annual increase %</label>
+              <input class="expense-growth" type="number" step="0.01" placeholder="0.00" value="${data.growth ?? ''}" />
+            </div>
+          </div>
+        </div>
+      `;
+
+      row.querySelector('.remove-row').addEventListener('click', () => {
+        row.remove();
+        calculate();
+        syncEmptyStates();
+      });
+      row.querySelector('.toggle-btn').addEventListener('click', () => toggleRow(row));
+      row.querySelector('.save-btn').addEventListener('click', () => {
+        summarizeExpense(row);
+        collapseRow(row);
+        calculate();
+      });
+      row.querySelectorAll('input, select').forEach(el => {
+        el.addEventListener('input', () => summarizeExpense(row));
+        el.addEventListener('change', () => summarizeExpense(row));
+      });
+
+      expenseList.appendChild(row);
+      summarizeExpense(row);
+      if (data.collapsed) collapseRow(row);
+      syncEmptyStates();
+      return row;
     }
 
     function getIncomes() {
@@ -650,46 +947,6 @@
         const projectedMonthly = monthly * Math.pow(1 + growthRate, yearIndex);
         return total + projectedMonthly * 12;
       }, 0);
-    }
-
-    function formatSignedCurrency(value) {
-      const formatted = money.format(Math.abs(value));
-      return value < 0 ? `-${formatted}` : formatted;
-    }
-
-    function applyValueTone(element, value) {
-      element.classList.remove('good', 'bad', 'warn');
-      if (value > 0) element.classList.add('good');
-      else if (value < 0) element.classList.add('bad');
-      else element.classList.add('warn');
-    }
-
-    function calculate() {
-      const incomes = getIncomes();
-      const expenses = getExpenses();
-      const annualIncome = incomes.reduce((sum, item) => sum + item.amount, 0);
-      const annualExpenses = computeProjectedAnnualExpenses(expenses, 0);
-      const grossAnnualSavings = annualIncome - annualExpenses;
-
-      const taxMode = document.getElementById('taxMode').value;
-      const taxAmount = num(document.getElementById('taxAmount').value);
-      let netAnnualSavings = grossAnnualSavings;
-      if (taxMode === 'paid') netAnnualSavings -= taxAmount;
-      if (taxMode === 'refund') netAnnualSavings += taxAmount;
-
-      const grossMonthlySavings = grossAnnualSavings / 12;
-      const netMonthlySavings = netAnnualSavings / 12;
-
-      updateValue('annualIncomeValue', annualIncome);
-      updateValue('annualExpenseValue', annualExpenses, false);
-      updateValue('grossAnnualSavingsValue', grossAnnualSavings);
-      updateValue('netAnnualSavingsValue', netAnnualSavings);
-      updateValue('grossMonthlySavingsValue', grossMonthlySavings);
-      updateValue('netMonthlySavingsValue', netMonthlySavings);
-
-      updateBar(annualIncome, annualExpenses, grossAnnualSavings);
-      updateProjectionTable(annualIncome, expenses, taxMode, taxAmount);
-      updateSummary(annualIncome, annualExpenses, grossAnnualSavings, netAnnualSavings, incomes.length, expenses.length);
     }
 
     function updateValue(id, value, tone = true) {
@@ -751,6 +1008,34 @@
       summary.textContent = `${name} currently has ${incomeCount} income source(s) and ${expenseCount} expense item(s). In year 1, annual income is ${formatSignedCurrency(annualIncome)}, annual expenses are ${formatSignedCurrency(annualExpenses)}, gross annual savings are ${formatSignedCurrency(grossAnnualSavings)}, and the adjusted annual result is ${formatSignedCurrency(netAnnualSavings)} with ${taxLabel}.`;
     }
 
+    function calculate() {
+      const incomes = getIncomes();
+      const expenses = getExpenses();
+      const annualIncome = incomes.reduce((sum, item) => sum + item.amount, 0);
+      const annualExpenses = computeProjectedAnnualExpenses(expenses, 0);
+      const grossAnnualSavings = annualIncome - annualExpenses;
+
+      const taxMode = document.getElementById('taxMode').value;
+      const taxAmount = num(document.getElementById('taxAmount').value);
+      let netAnnualSavings = grossAnnualSavings;
+      if (taxMode === 'paid') netAnnualSavings -= taxAmount;
+      if (taxMode === 'refund') netAnnualSavings += taxAmount;
+
+      const grossMonthlySavings = grossAnnualSavings / 12;
+      const netMonthlySavings = netAnnualSavings / 12;
+
+      updateValue('annualIncomeValue', annualIncome);
+      updateValue('annualExpenseValue', annualExpenses, false);
+      updateValue('grossAnnualSavingsValue', grossAnnualSavings);
+      updateValue('netAnnualSavingsValue', netAnnualSavings);
+      updateValue('grossMonthlySavingsValue', grossMonthlySavings);
+      updateValue('netMonthlySavingsValue', netMonthlySavings);
+      updateBar(annualIncome, annualExpenses, grossAnnualSavings);
+      updateProjectionTable(annualIncome, expenses, taxMode, taxAmount);
+      updateSummary(annualIncome, annualExpenses, grossAnnualSavings, netAnnualSavings, incomes.length, expenses.length);
+      syncEmptyStates();
+    }
+
     function resetAll() {
       document.getElementById('fullName').value = '';
       document.getElementById('profession').value = '';
@@ -764,39 +1049,61 @@
       createIncomeRow();
       createExpenseRow();
       calculate();
+      showStep(0);
     }
 
     function loadExample() {
-      document.getElementById('fullName').value = 'Julio';
-      document.getElementById('profession').value = 'Multiple jobs / side income';
+      document.getElementById('fullName').value = 'Julio Perera';
+      document.getElementById('profession').value = 'Amazon Flex, Trading';
       document.getElementById('projectionYears').value = '5';
-      document.getElementById('taxMode').value = 'refund';
-      document.getElementById('taxAmount').value = '2500';
+      document.getElementById('taxMode').value = 'paid';
+      document.getElementById('taxAmount').value = '7000';
+
       incomeList.innerHTML = '';
       expenseList.innerHTML = '';
       incomeCounter = 0;
       expenseCounter = 0;
 
-      createIncomeRow({ name: 'Main Job', type: 'salary', amount: 54000 });
-      createIncomeRow({ name: 'Second Job', type: 'hourly', amount: 18000 });
-      createIncomeRow({ name: 'Amazon Flex / Extra', type: 'side-income', amount: 9000 });
+      createIncomeRow({ name: 'Amazon Flex', type: 'self-employed', amount: 36000, collapsed: true });
+      createIncomeRow({ name: 'Trading', type: 'self-employed', amount: 50000, collapsed: true });
 
-      createExpenseRow({ name: 'Rent', category: 'fixed', amount: 1800, growthEnabled: true, growth: 5 });
-      createExpenseRow({ name: 'Car Payment', category: 'fixed', amount: 740, growthEnabled: false, growth: 0 });
-      createExpenseRow({ name: 'Car Insurance', category: 'fixed', amount: 260, growthEnabled: true, growth: 6 });
-      createExpenseRow({ name: 'Gas', category: 'variable', amount: 420, growthEnabled: true, growth: 4 });
-      createExpenseRow({ name: 'Food', category: 'variable', amount: 650, growthEnabled: true, growth: 4 });
-      createExpenseRow({ name: 'Phone + Internet', category: 'fixed', amount: 180, growthEnabled: true, growth: 3 });
-      createExpenseRow({ name: 'Subscriptions / Other', category: 'other', amount: 120, growthEnabled: false, growth: 0 });
+      createExpenseRow({ name: 'Rent', category: 'fixed', amount: 1520, growthEnabled: false, growth: 0, collapsed: true });
+      createExpenseRow({ name: 'Car', category: 'fixed', amount: 800, growthEnabled: false, growth: 0, collapsed: true });
+      createExpenseRow({ name: 'Expenses', category: 'variable', amount: 1000, growthEnabled: false, growth: 0, collapsed: true });
+      createExpenseRow({ name: 'Investment', category: 'fixed', amount: 1100, growthEnabled: true, growth: 10, collapsed: true });
 
       calculate();
+      showStep(3);
     }
 
-    document.getElementById('addIncomeBtn').addEventListener('click', () => createIncomeRow());
-    document.getElementById('addExpenseBtn').addEventListener('click', () => createExpenseRow());
+    document.getElementById('addIncomeBtn').addEventListener('click', () => {
+      createIncomeRow();
+      calculate();
+    });
+    document.getElementById('addExpenseBtn').addEventListener('click', () => {
+      createExpenseRow();
+      calculate();
+    });
+    document.getElementById('expandAllIncomesBtn').addEventListener('click', () => {
+      document.querySelectorAll('.income-row').forEach(expandRow);
+    });
+    document.getElementById('expandAllExpensesBtn').addEventListener('click', () => {
+      document.querySelectorAll('.expense-row').forEach(expandRow);
+    });
     document.getElementById('calculateBtn').addEventListener('click', calculate);
     document.getElementById('loadExampleBtn').addEventListener('click', loadExample);
     document.getElementById('resetBtn').addEventListener('click', resetAll);
+
+    document.querySelectorAll('.next-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        calculate();
+        showStep(currentStep + 1);
+      });
+    });
+
+    document.querySelectorAll('.prev-btn').forEach(btn => {
+      btn.addEventListener('click', () => showStep(currentStep - 1));
+    });
 
     document.addEventListener('input', (e) => {
       if (e.target.matches('input, select')) calculate();
@@ -805,6 +1112,7 @@
       if (e.target.matches('input, select')) calculate();
     });
 
+    renderStepper();
     createIncomeRow();
     createExpenseRow();
     calculate();
