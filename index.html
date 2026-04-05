@@ -537,6 +537,10 @@
             <div class="eyebrow">Step 1</div>
             <h3>Set your projection and tax impact</h3>
             <p class="sub">This calculator is designed to show how much cash remains in your bank account after your normal yearly income, recurring monthly expenses, and the tax amount you choose to include manually.</p>
+            <div class="field">
+              <label for="userName">Your Name</label>
+              <input id="userName" type="text" placeholder="Julio" />
+            </div>
             <div class="grid-2">
               <div class="field">
                 <label for="projectionYears">Projection Years</label>
@@ -566,7 +570,7 @@
           <div id="step2" class="step-panel" style="display:none;">
             <div class="eyebrow">Step 2</div>
             <h3>Add your annual income sources</h3>
-            <p class="sub">Add an income and press SAVE. Each saved item will appear below. Repeat to add more.</p>
+            <p class="sub">Add one income, press <strong>Save Income</strong>, then repeat to add another. Each saved item appears below in a collapsed summary card.</p>
 
             <div id="incomeComposer" class="composer">
               <div class="grid-2">
@@ -595,7 +599,7 @@
           <div id="step3" class="step-panel" style="display:none;">
             <div class="eyebrow">Step 3</div>
             <h3>Add your monthly expenses</h3>
-            <p class="sub">Add an expense and press SAVE. Each saved item will appear below. Repeat to add more. You can optionally set annual increase.</p>
+            <p class="sub">Add one expense, press <strong>Save Expense</strong>, then repeat to add another. You can also set an optional annual increase for each expense.</p>
 
             <div id="expenseComposer" class="composer">
               <div class="grid-2">
@@ -762,6 +766,7 @@
     document.getElementById('incomeName').value = '';
     document.getElementById('incomeAmount').value = '';
     renderIncomeList();
+    document.getElementById('incomeName').focus();
   }
 
   function saveExpense(){
@@ -787,6 +792,7 @@
     document.getElementById('expenseIncrease').value = '';
     document.getElementById('expenseIncrease').disabled = true;
     renderExpenseList();
+    document.getElementById('expenseName').focus();
   }
 
   function renderIncomeList(){
@@ -995,59 +1001,30 @@
       </tr>
     `).join('');
 
-    drawChart(projection);
     goStep(4);
+    requestAnimationFrame(() => drawChart(projection));
   }
 
   function drawChart(projection){
-  const canvas = document.getElementById('projectionChart');
-  const ctx = canvas.getContext('2d');
+    const canvas = document.getElementById('projectionChart');
+    const ctx = canvas.getContext('2d');
 
-  // FIX: force real size (prevents black chart)
-  canvas.width = canvas.offsetWidth;
-  canvas.height = 320;
+    const cssWidth = Math.max(canvas.offsetWidth || 0, 300);
+    const cssHeight = 320;
+    const dpr = window.devicePixelRatio || 1;
 
-  ctx.clearRect(0,0,canvas.width,canvas.height);
+    canvas.width = Math.floor(cssWidth * dpr);
+    canvas.height = Math.floor(cssHeight * dpr);
+    canvas.style.width = cssWidth + 'px';
+    canvas.style.height = cssHeight + 'px';
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 
-  const width = canvas.width;
-  const height = canvas.height;
+    const width = cssWidth;
+    const height = cssHeight;
 
-  const pad = {top:20,left:60,right:20,bottom:40};
-  const chartW = width - pad.left - pad.right;
-  const chartH = height - pad.top - pad.bottom;
+    ctx.clearRect(0, 0, width, height);
 
-  const income = projection.map(p=>p.income);
-  const expenses = projection.map(p=>p.expenses);
-  const savings = projection.map(p=>p.adjusted);
-
-  const max = Math.max(...income, ...expenses, ...savings);
-  const min = Math.min(0, ...income, ...expenses, ...savings);
-
-  function x(i){
-    return pad.left + (chartW * i / (projection.length - 1 || 1));
-  }
-
-  function y(v){
-    return pad.top + chartH - ((v - min) / (max - min)) * chartH;
-  }
-
-  function drawLine(data, color){
-    ctx.beginPath();
-    ctx.strokeStyle = color;
-    ctx.lineWidth = 3;
-
-    data.forEach((v,i)=>{
-      if(i===0) ctx.moveTo(x(i), y(v));
-      else ctx.lineTo(x(i), y(v));
-    });
-
-    ctx.stroke();
-  }
-
-  drawLine(income, "#4da3ff");
-  drawLine(expenses, "#ff9f50");
-  drawLine(savings, "#55d6a1");
-};
+    const pad = {top:18,right:16,bottom:36,left:68};
     const chartW = width - pad.left - pad.right;
     const chartH = height - pad.top - pad.bottom;
 
@@ -1059,7 +1036,6 @@
     const allVals = [...s1, ...s2, ...s3];
     const maxVal = Math.max(...allVals, 1);
     const minVal = Math.min(...allVals, 0);
-    const range = Math.max(maxVal - Math.min(minVal, 0), 1);
     const yMax = Math.max(maxVal * 1.08, 1);
     const yMin = Math.min(0, minVal * 1.08);
 
@@ -1067,8 +1043,9 @@
       if(labels.length === 1) return pad.left + chartW / 2;
       return pad.left + (chartW * i / (labels.length - 1));
     }
+
     function yPos(v){
-      const t = (v - yMin) / (yMax - yMin);
+      const t = (v - yMin) / (yMax - yMin || 1);
       return pad.top + chartH - (t * chartH);
     }
 
@@ -1177,6 +1154,23 @@
   function escapeAttr(str){
     return escapeHtml(str);
   }
+
+  document.addEventListener('keydown', (e) => {
+    if(e.key !== 'Enter') return;
+
+    const active = document.activeElement;
+    if(!active) return;
+
+    if(active.id === 'incomeName' || active.id === 'incomeAmount'){
+      e.preventDefault();
+      saveIncome();
+    }
+
+    if(active.id === 'expenseName' || active.id === 'expenseAmount' || active.id === 'expenseIncrease'){
+      e.preventDefault();
+      saveExpense();
+    }
+  });
 
   renderIncomeList();
   renderExpenseList();
